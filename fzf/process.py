@@ -31,7 +31,7 @@ class Fzf:
         disable_env: bool = False,
         *,
         encoding="utf-8",
-        encoding_errors="strict"
+        encoding_errors="strict",
     ):
         opts = opts or []
 
@@ -58,7 +58,7 @@ class Fzf:
         executable=EXECUTABLE,
         encoding="utf-8",
         encoding_errors="strict",
-        **opts
+        **opts,
     ):
         return cls(
             executable=executable,
@@ -142,25 +142,22 @@ def fzf_prompt(
     flush_last: bool = False,
     *,
     executable=EXECUTABLE,
-    **opts
+    **opts,
 ) -> typing.Union[T, typing.List[T]]:
     with Fzf.load_with_options(
         executable=executable,
         encoding=encoding,
         encoding_errors=encoding_errors,
-        **opts
+        **opts,
     ) as fzf:
-        if escape_output:
-            output_escape = lambda value: repr(value)[
-                1:-1
-            ]  # type: typing.Callable[[str], str]
-        else:
-            output_escape = lambda value: value  # type: typing.Callable[[str], str]
+
+        def output_escape(value: str) -> str:
+            return repr(value)[1:-1] if escape_output else value
 
         if processor:
             shallow_copy = {}
 
-            def raw_process_save(value: str, processed_value: str):
+            def raw_process_save(value: T, processed_value: str):
                 if processed_value in shallow_copy:
                     return raw_process_save(
                         value, duplication_treatment(processed_value)
@@ -178,7 +175,7 @@ def fzf_prompt(
                 for value in components
             )
         else:
-            generator = (output_escape(value) for value in components)
+            generator = (output_escape(str(value)) for value in components)
 
         fzf.add_lines(lines=generator, flush_last=flush_last)
 
