@@ -1,5 +1,5 @@
 [project]
-name            = "fzf-py"
+name            = "fzf"
 version         = "0.1.0"
 description     = "Fzf.py - A Pythonic Fzf Wrapper"
 readme          = "README.md"
